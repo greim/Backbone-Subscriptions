@@ -31,7 +31,7 @@ This is possible because view elements are given the classname 'subscriber'.
 The browser's native DOM engine is then used to locate these elements in a performant manner, by merely looping through a [live NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList#A_.22live.22_collection) on each event.
 This approach gives three main benefits:
 
- 1. Only views present in the live document receive updates from a channel (AKA a named event).
+ 1. Only views present in the live document receive updates from a channel (AKA an event that you can name anything you want).
  2. Views are naturally GC'd as sections of the DOM are overwritten, eliminating the need to manually unsubscribe from channels or write any other reference maintenance/cleanup code.
  3. It allows the implementation to be compact and clean.
 
