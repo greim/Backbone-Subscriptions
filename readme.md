@@ -44,7 +44,7 @@ The API is quite simple, and pretty much consists of the below.
         window.addEventListener('message', _.bind(function(ev){
           var message = JSON.parse(ev.data);
           this.message(message);
-        }));
+        }, this));
       },
       message: function(message){ ... }
     });
