@@ -93,45 +93,31 @@ SOFTWARE.
 
         /**
          * Publish/subscribe for Backbone views.
-         * To notify views in the current DOM, do this:
-         *
-         *     Backbone.publish('foo');
-         *
-         * To subscribe to events from views, do this:
-         *
-         *     Backbone.View.extend({
-         *         subscriptions: {
-         *             'foo': 'doFoo'
-         *         },
-         *         doFoo: function(){
-         *             ...
-         *         }
-         *     });
          */
-        Backbone.publish = function(eventName){
-            var args = Array.prototype.slice.call(arguments, 1);
-            var liveElements = elementListByClass('subscriber');
-            var proms = _(liveElements).filter(function(el){
-                return el.view
-                    && el.view.subscriptions
-                    && el.view.subscriptions[eventName];
-            });
-            proms = _(proms).map(function(el){
-                var view = el.view;
-                var subs = view.subscriptions;
-                var methodName = subs[eventName];
-                var prom = view[methodName].apply(view, args);
-                if (!(prom instanceof await)) {
-                    prom = await();
-                }
-                return prom;
-            });
-            return await.all(proms);
-        };
+        Backbone.Subscriptions = {
+            publish: function(channel){
+                var args = Array.prototype.slice.call(arguments, 1);
+                var liveElements = elementListByClass('subscriber');
+                var proms = _(liveElements).filter(function(el){
+                    return el.view
+                        && el.view.subscriptions
+                        && el.view.subscriptions[channel];
+                });
+                proms = _(proms).map(function(el){
+                    var view = el.view;
+                    var subs = view.subscriptions;
+                    var methodName = subs[channel];
+                    var prom = view[methodName].apply(view, args);
+                    if (!(prom instanceof await)) {
+                        prom = await();
+                    }
+                    return prom;
+                });
+                return await.all(proms);
+            }
+        }
     });
 
-    return function(){
-        return Backbone.publish.apply(Backbone, arguments);
-    };
+    return Backbone.Subscriptions;
 
 })();
