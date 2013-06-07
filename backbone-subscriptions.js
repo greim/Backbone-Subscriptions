@@ -28,13 +28,13 @@ SOFTWARE.
 // ########################################################################
 // BACKBONE SUBSCRIPTIONS
 
-(function(){
+(function() {
 
   /*
    * If AMD is available, use it.
    */
   var isAmd = typeof window.define === "function" && window.define.amd;
-  var define = isAmd ? window.define : function(list, cb){
+  var define = isAmd ? window.define : function(list, cb) {
     cb(jQuery, Backbone, _, window.await);
   };
 
@@ -48,14 +48,14 @@ SOFTWARE.
     Backbone,
     _,
     await
-  ){
+  ) {
 
     /*
      * This is a bit of voodoo to ensure that subscribing
      * views are reachable through the DOM.
      */
     var setElement = Backbone.View.prototype.setElement;
-    Backbone.View.prototype.setElement = function(){
+    Backbone.View.prototype.setElement = function() {
       var result = setElement.apply(this, arguments);
       if (this.subscriptions) {
         this.el.view = this;
@@ -73,11 +73,11 @@ SOFTWARE.
      * Returns a list of elements by class name. Uses native
      * DOM query functionality for maximum performance.
      */
-    var elementListByClass = (function(){
+    var elementListByClass = (function() {
       var lists = {}; // this is the cache
       var slice = [].slice;
       var useFallback = typeof document.getElementsByClassName !== 'function';
-      return function(className){
+      return function(className) {
         if (useFallback) {
           return slice.call(document.querySelectorAll('.'+className));
         } else {
@@ -95,15 +95,15 @@ SOFTWARE.
      * Publish/subscribe for Backbone views.
      */
     Backbone.Subscriptions = {
-      publish: function(channel){
+      publish: function(channel) {
         var args = Array.prototype.slice.call(arguments, 1);
         var liveElements = elementListByClass('subscriber');
-        var proms = _(liveElements).filter(function(el){
+        var proms = _(liveElements).filter(function(el) {
           return el.view
             && el.view.subscriptions
             && el.view.subscriptions[channel];
         });
-        proms = _(proms).map(function(el){
+        proms = _(proms).map(function(el) {
           var view = el.view;
           var subs = view.subscriptions;
           var methodName = subs[channel];
