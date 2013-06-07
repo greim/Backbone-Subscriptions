@@ -37,16 +37,28 @@ This approach gives three main benefits:
 
 ## API
 
-The API is quite simple, and pretty much consists of the below:
+Given that unsubscribing is implicit and no reference cleanup code is required, the API is rather simple:
 
-    Backbone.Subscriptions.publish(channel, [arg1, ...argN])
+### Publishing
+
+    // arg1 - N are optional and are passed
+    // to the handler on the view.
+    Backbone.Subscriptions.publish(channel, arg1, ... argN);
+
+### Subscribing
 
     Backbone.View.extend({
+
+      // Subscribe to as many "channels"
+      // (named events) as you want.
       subscriptions: {
         channel: method
         ...
       },
-      method: function(arg1, ...argN) {
+
+      // A method, just like any other
+      // Backbone view method.
+      method: function(arg1, ... argN) {
         ...
       }
     });
