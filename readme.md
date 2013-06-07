@@ -1,6 +1,9 @@
 # Backbone Subscriptions
 
-Backbone subscriptions is a Backbone.js extension that provides loosely-coupled, app-wide communication between views, via a publish/subscribe pattern. Backbone views are introverts when it comes to event handling. They're great at reacting to internally-generated events, but not-so-great at reacting to externally-generated ones. Backbone subscriptions provides a unique and clean solution to this problem.
+Backbone subscriptions is a Backbone.js extension that provides loosely-coupled, app-wide communication between views, via a publish/subscribe pattern.
+Backbone views are introverts when it comes to event handling.
+They're great at reacting to internally-generated events, but not-so-great at reacting to externally-generated ones.
+Backbone subscriptions provides a unique and clean solution to this problem.
 
 ## Example
 
@@ -16,11 +19,17 @@ Backbone subscriptions is a Backbone.js extension that provides loosely-coupled,
       handleMessage: function(message){ ... }
     });
 
-The above shows an example of making a view respond to cross-window communication messages originating at `window`. Similar use cases might include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
+The above shows an example of making a view respond to cross-window communication messages originating at `window`.
+Similar use cases include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
 
 ## Key concepts
 
-The key concept of Backbone subscriptions — and what differentiates it from similar libraries — is its *DOM-orientedness*. No internal reference map is used to track which instance subscribes to what. Rather, subscribing views are lazily discovered at publish-time via the DOM. This is possible because view elements are given the className 'subscriber'. The browser's native DOM engine is then used to locate these elements in a performant manner. This approach gives three main benefits:
+The key concept of Backbone subscriptions — and what differentiates it from similar libraries — is its reliance on the DOM as the system of record for views.
+No internal reference map is used to track which instance subscribes to what.
+Rather, subscribing views are lazily discovered at publish-time via the DOM.
+This is possible because view elements are given the classname 'subscriber'.
+The browser's native DOM engine is then used to locate these elements in a performant manner, by merely looping through a [live NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList#A_.22live.22_collection) on each event.
+This approach gives three main benefits:
 
  1. Only views present in the live document receive updates from a channel (AKA a named event).
  2. Views are naturally GC'd as sections of the DOM are overwritten, eliminating the need to manually unsubscribe from channels or write any other reference maintenance/cleanup code.
@@ -30,11 +39,16 @@ The key concept of Backbone subscriptions — and what differentiates it from si
 
 The API is quite simple, and pretty much consists of the below:
 
-    Backbone.Subscriptions.publish(channel, [arg1, ... argN])
+    Backbone.Subscriptions.publish(channel, [arg1, ...argN])
 
     Backbone.View.extend({
-      subscriptions: { channel: method },
-      method: function(arg1, ... argN) { ... }
+      subscriptions: {
+        channel: method
+        ...
+      },
+      method: function(arg1, ...argN) {
+        ...
+      }
     });
 
 ## Why not just add events in initialize?
@@ -49,11 +63,18 @@ The API is quite simple, and pretty much consists of the below:
       message: function(message){ ... }
     });
 
-This is a classic anti-pattern in Backbone development. It works, but it adds a separate event handler to `window` every time a new view is created. Each of these continues to run in the background forever, even if the view is no longer present in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) maintain references back to every view instance ever created. Also, it's a potential source of non-performance-related bugs, if the event handler does more than just operate on the view instance. Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
+This is a classic anti-pattern in Backbone development.
+It works, but it adds a separate event handler to `window` every time a new view is created.
+Each of these continues to run in the background forever, even if the view is no longer present in the DOM.
+Not only is it a CPU drain, but it's a memory leak, since functions stored on `window` (the event handlers) maintain reference chains back to every view instance ever created.
+Also, it's a potential source of non-performance-related bugs if the event handler does more than just operate on the view instance.
+Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
 
 ## Browser support
 
-Browsers that support [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) are supported. Those methods are what enbable it to do lazy view discovery in a performant manner. In practical terms, this means that Backbone subscriptions should work in all modern browsers, plus IE8 and above.
+Browsers that support [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) are supported.
+These methods are what enbable it to do lazy view discovery in a performant manner.
+In practical terms, this means that Backbone subscriptions should work in IE8 and above, plus any remotely modern webkit/gecko/presto.
 
 ## AMD/RequireJS
 
