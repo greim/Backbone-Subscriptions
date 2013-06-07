@@ -42,7 +42,7 @@ Backbone subscriptions has no dependencies besides Backbone. If the [await](http
 
 ## Browser support
 
-Browsers that don't support the [selector API](http://www.w3.org/TR/selectors-api2/) aren't supported. In practical terms, this means that Backbone subscriptions should work in all modern browsers as of 2013, and also in IE8 and above.
+Browsers that don't support `getElementsByClassName()` or the [selector API](http://www.w3.org/TR/selectors-api2/) aren't supported. Those methods are how it does lazy view discovery in a performant manner. In practical terms, this means that Backbone subscriptions should work in all modern browsers as of 2013, and also in IE8 and above.
 
 ## AMD/RequireJS
 
