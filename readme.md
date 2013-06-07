@@ -28,7 +28,7 @@ The above shows an example of making a view respond to cross-window communicatio
       message: function(message){ ... }
     });
 
-This will certainly work, however it adds additional event handlers to `window` as more instances of that view are created. Each extra handler still runs in the background, even though the view is no longer visible in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) keeps references to each view instance.
+This will certainly work, however it adds additional event handlers to `window` as more instances of that view are created. Each extra handler still runs in the background, even though the view is no longer visible in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) keep references to each view instance.
 
 ## What happens to a view after it goes away?
 
