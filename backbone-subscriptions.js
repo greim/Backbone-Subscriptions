@@ -98,12 +98,12 @@ SOFTWARE.
       publish: function(channel) {
         var args = Array.prototype.slice.call(arguments, 1);
         var liveElements = elementListByClass('subscriber');
-        var proms = _(liveElements).filter(function(el) {
+        var subscribingElements = _(liveElements).filter(function(el) {
           return el.view
             && el.view.subscriptions
             && el.view.subscriptions[channel];
         });
-        proms = _(proms).map(function(el) {
+        var proms = _(subscribingElements).map(function(el) {
           var view = el.view;
           var subs = view.subscriptions;
           var methodName = subs[channel];
