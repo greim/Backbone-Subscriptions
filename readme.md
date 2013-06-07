@@ -10,8 +10,8 @@ Backbone subscriptions is a Backbone.js extension that provides loosely-coupled 
 
     // a view that subscribes to that event
     var MyView = Backbone.View.extend({
-      subscriptions: { 'message': 'message' },
-      message: function(message){ ... }
+      subscriptions: { 'message': 'handleMessage' },
+      handleMessage: function(message){ ... }
     });
 
 The above shows an example of making a view respond to cross-window communication messages. Other external events that views might want to subscribe to include page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
