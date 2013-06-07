@@ -5,16 +5,18 @@
      */
     var isAmd = typeof window.define === "function" && window.define.amd;
     var define = isAmd ? window.define : function(list, cb){
-        cb(jQuery, Backbone, window.await);
+        cb(jQuery, Backbone, _, window.await);
     };
 
     define([
         'jquery',
         'backbone',
+        'underscore',
         'await'
     ],function(
         $,
         Backbone,
+        _,
         await
     ){
 
@@ -79,13 +81,12 @@
         Backbone.publish = function(eventName){
             var args = Array.prototype.slice.call(arguments, 1);
             var liveElements = elementListByClass('subscriber');
-            var proms = liveElements
-            .filter(function(el){
+            var proms = _(liveElements).filter(function(el){
                 return el.view
                     && el.view.subscriptions
                     && el.view.subscriptions[eventName];
-            })
-            .map(function(el){
+            });
+            proms = _(proms).map(function(el){
                 var view = el.view;
                 var subs = view.subscriptions;
                 var methodName = subs[eventName];
