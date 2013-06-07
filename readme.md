@@ -25,7 +25,7 @@ Similar use cases include subscribing to page visibility or focus changes, devic
 ## Core concepts
 
 What differentiates this from similar libraries is its reliance on the DOM as the system of record for views.
-No internal reference map is used to track which instance subscribes to what.
+No internal reference map is used to track which instances exist or which subscribes to what.
 Rather, subscribing views are lazily discovered at publish-time via the DOM.
 This is possible because view elements are given the classname 'subscriber'.
 The browser's native DOM engine is then used to locate these elements in a performant manner, by merely looping through a [live NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList#A_.22live.22_collection) on each event.
