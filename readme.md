@@ -1,6 +1,6 @@
 # Backbone Subscriptions
 
-Backbone subscriptions is a Backbone.js extension that provides loosely-coupled communication between views. It does this via a publish/subscribe pattern. Backbone views are in many ways self-contained mini-apps. While it's easy for them to react to things that happen in its own scope, it's not so easy for it to react to things that originate outside itself. Backbone subscriptions provides a clean solution to this problem.
+Backbone subscriptions is a Backbone.js extension that provides loosely-coupled communication between views. It does this via a publish/subscribe pattern. Backbone views are in many ways self-contained mini-apps. While it's easy for them to react to things that happen in their own scope, it's not so easy for them to react to things that originate outside themselves. Backbone subscriptions provides a clean solution to this problem.
 
     // an event that originates at the global level
     window.addEventListener('message', function(ev){
