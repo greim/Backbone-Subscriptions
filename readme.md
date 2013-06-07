@@ -20,7 +20,9 @@ The above shows an example of making a view respond to cross-window communicatio
 
 ## Key concepts
 
-The key concept of Backbone subscriptions--and what differentiates if from similar libraries--is its DOM-orientedness. No internal reference map or list is kept of which view instances subscribe to which events. Rather, subscribing view instances are lazily discovered at publish-time via the DOM. This means that only views present in the document are capable of receiving updates from a channel. The browser's native DOM access methods are used to do this performantly. `getElementsByClassName()` is used if possible, falling back to `querySelectorAll()`. This also means that views are naturally garbage collected as sections of the DOM are removed or overwritten, *eliminating the need for the programmer to manually unsubscribe from channels or write any other cleanup code*. Finally, this approach allows the implementation to remain short and clean.
+The key concept of Backbone subscriptions—and what differentiates if from similar libraries—is its DOM-orientedness. No internal reference map or list is kept of which view instances subscribe to which events. Rather, subscribing view instances are lazily discovered at publish-time via the DOM.
+
+This means that only views present in the document are capable of receiving updates from a channel. The browser's native DOM access methods are used to do this performantly. `getElementsByClassName()` is used if possible, falling back to `querySelectorAll()`. This also means that views are naturally garbage collected as sections of the DOM are removed or overwritten, *eliminating the need for the programmer to manually unsubscribe from channels or write any other cleanup code*. Finally, this approach allows the implementation to remain short and clean.
 
 ## API
 
