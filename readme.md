@@ -22,9 +22,9 @@ Backbone subscriptions provides a unique and clean solution to this problem.
 The above shows an example of making a view respond to cross-window communication messages originating at `window`.
 Similar use cases include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
 
-## Key concepts
+## Core concepts
 
-The key concept of Backbone subscriptions — and what differentiates it from similar libraries — is its reliance on the DOM as the system of record for views.
+What differentiates this from similar libraries is its reliance on the DOM as the system of record for views.
 No internal reference map is used to track which instance subscribes to what.
 Rather, subscribing views are lazily discovered at publish-time via the DOM.
 This is possible because view elements are given the classname 'subscriber'.
@@ -37,27 +37,33 @@ This approach gives three main benefits:
 
 ## API
 
-Given that unsubscribing is implicit and no reference cleanup code is required, the API is rather simple:
+Given that unsubscribing is implicit and no reference cleanup code is needed, the API is rather simple:
 
 ### Publishing
 
-    // arg1 - N are optional and are passed
-    // to the handler on the view.
+    /*
+     * arg1 - N are optional and are passed
+     * to the handler on the view.
+     */
     Backbone.Subscriptions.publish(channel, arg1, ... argN);
 
 ### Subscribing
 
     Backbone.View.extend({
 
-      // Subscribe to as many "channels"
-      // (named events) as you want.
+      /*
+       * Subscribe to as many "channels"
+       * (named events) as you want.
+       */
       subscriptions: {
         channel: method
         ...
       },
 
-      // A method, just like any other
-      // Backbone view method.
+      /*
+       * A method, just like any other
+       * Backbone view method.
+       */
       method: function(arg1, ... argN) {
         ...
       }
@@ -79,14 +85,14 @@ This is a classic anti-pattern in Backbone development.
 It works, but it adds a separate event handler to `window` every time a new view is created.
 Each of these continues to run in the background forever, even if the view is no longer present in the DOM.
 Not only is it a CPU drain, but it's a memory leak, since functions stored on `window` (the event handlers) maintain reference chains back to every view instance ever created.
-Also, it's a potential source of non-performance-related bugs if the event handler does more than just operate on the view instance.
+Also, it's a potential source of non-performance-related bugs if the event handler is non-idempotent.
 Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
 
 ## Browser support
 
-Browsers that support [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) are supported.
+Any browser that supports [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
 These methods are what enbable it to do lazy view discovery in a performant manner.
-In practical terms, this means that Backbone subscriptions should work in IE8 and above, plus any remotely modern webkit/gecko/presto.
+In practical terms, this means that Backbone subscriptions should work in IE8 and above, plus any remotely modern Webkit/Gecko/Presto.
 
 ## AMD/RequireJS
 
