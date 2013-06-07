@@ -20,7 +20,7 @@ The above shows an example of making a view respond to cross-window communicatio
 
 ## Key concepts
 
-The key concept of Backbone subscriptions — and what differentiates it from similar libraries — is its *DOM-orientedness*. No internal reference map is used to track what instance subscribes to what. Rather, subscribing views are lazily discovered at publish-time via the DOM. This is possible because view elements are given the className 'subscriber'. The browser's native DOM engine is then used to locate these elements in a performant manner. This approach gives three main benefits:
+The key concept of Backbone subscriptions — and what differentiates it from similar libraries — is its *DOM-orientedness*. No internal reference map is used to track which instance subscribes to what. Rather, subscribing views are lazily discovered at publish-time via the DOM. This is possible because view elements are given the className 'subscriber'. The browser's native DOM engine is then used to locate these elements in a performant manner. This approach gives three main benefits:
 
  1. Only views present in the live document receive updates from a channel (AKA a named event).
  2. Views are naturally GC'd as sections of the DOM are overwritten, eliminating the need to manually unsubscribe from channels or write any other reference maintenance/cleanup code.
@@ -49,7 +49,7 @@ The API is quite simple, and pretty much consists of the below:
       message: function(message){ ... }
     });
 
-This will certainly work, however it adds a separate event handler to `window` every time a new view is created. Each of these still runs in the background, even though the view is no longer visible in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) maintain references back to every view instance ever created.
+This is a classic anti-pattern in Backbone development. It works, but it adds a separate event handler to `window` every time a new view is created. Each of these continues to run in the background forever, even if the view is no longer present in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) maintain references back to every view instance ever created. Also, it's a potential source of non-performance-related bugs, if the event handler does more than just operate on the view instance. Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
 
 ## Browser support
 
