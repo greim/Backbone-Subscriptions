@@ -116,8 +116,8 @@ SOFTWARE.
         return await.all(proms);
       }
     }
-  });
 
-  return Backbone.Subscriptions;
-
+    return Backbone.Subscriptions;
+  
+  }); // end of define()
 })();
