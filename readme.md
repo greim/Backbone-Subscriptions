@@ -1,6 +1,6 @@
 # Backbone Subscriptions
 
-Backbone subscriptions is a Backbone.js extension that provides loosely-coupled communication between views. It does this via a publish/subscribe pattern. Backbone views are in many ways self-contained mini-apps. While it's easy for them to react to things that happen in their own scope, it's not so easy for them to react to things that originate outside themselves. Backbone subscriptions provides a unique solution to this problem.
+Backbone subscriptions is a Backbone.js extension that provides loosely-coupled, app-wide communication between views. It does this via a publish/subscribe pattern. Backbone views are in many ways self-contained mini-apps. Because of this, it's easy for them to react to things that happen in their own scope, but it's messy to try to get them to react to things originating outside of themselves. Backbone subscriptions provides a unique and clean solution to this problem.
 
 ## Example
 
@@ -16,13 +16,17 @@ Backbone subscriptions is a Backbone.js extension that provides loosely-coupled 
       handleMessage: function(message){ ... }
     });
 
-The above shows an example of making a view respond to cross-window communication messages, which originate at the global level. Similar use cases might include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
+The above shows an example of making a view respond to cross-window communication messages originating at the `window` level. Similar use cases might include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
 
 ## Key concepts
 
-The key concept of Backbone subscriptions—and what differentiates if from similar libraries—is its DOM-orientedness. No internal reference map or list is kept of which view instances subscribe to which events. Rather, subscribing view instances are lazily discovered at publish-time via the DOM.
+The key concept of Backbone subscriptions—and what differentiates if from similar libraries—is its DOM-orientedness. No internal reference map or list is kept of which view instances subscribe to which channels. Rather, subscribing view instances are lazily discovered at publish-time via the DOM. The browser's native DOM access methods are used to do this performantly. `getElementsByClassName()` is used if possible, falling back to `querySelectorAll()`.
 
-This means that only views present in the document are capable of receiving updates from a channel. The browser's native DOM access methods are used to do this performantly. `getElementsByClassName()` is used if possible, falling back to `querySelectorAll()`. This also means that views are naturally garbage collected as sections of the DOM are removed or overwritten, *eliminating the need for the programmer to manually unsubscribe from channels or write any other cleanup code*. Finally, this approach allows the implementation to remain short and clean.
+This creates three benefits:
+
+ 1. Only views present in the document are capable of receiving updates from a channel.
+ 2. Views are naturally garbage collected as sections of the DOM are overwritten, eliminating the need to manually unsubscribe from channels or write any other cleanup code.
+ 3. It allows the implementation to be short and clean.
 
 ## API
 
@@ -47,7 +51,7 @@ The API is quite simple, and pretty much consists of the below.
       message: function(message){ ... }
     });
 
-This will certainly work, however it adds additional event handlers to `window` as more instances of that view are created. Each extra handler still runs in the background, even though the view is no longer visible in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) keep references to each view instance.
+This will certainly work, however it adds additional event handlers to `window` as more instances of that view are created. Each extra handler still runs in the background, even though the view is no longer visible in the DOM. Not only is it a CPU drain, but it's a memory leak, since functions stored on the window (the event handlers) keep references to every view instance ever created.
 
 ## No dependencies
 
