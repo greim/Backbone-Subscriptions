@@ -50,6 +50,8 @@ SOFTWARE.
     await
   ) {
 
+    var subscriberClassName = 'subscriber';
+
     /*
      * This is a bit of voodoo to ensure that subscribing
      * views are reachable through the DOM.
@@ -59,7 +61,7 @@ SOFTWARE.
       var result = setElement.apply(this, arguments);
       if (this.subscriptions) {
         this.el.view = this;
-        this.el.className += ' subscriber';
+        this.el.className += ' ' + subscriberClassName;
       }
       return result;
     };
@@ -91,13 +93,16 @@ SOFTWARE.
       };
     })();
 
-    /**
-     * Publish/subscribe for Backbone views.
-     */
     Backbone.Subscriptions = {
+
+    /**
+     * Publish a message to any subscribing Backbone views.
+     * @param channel - String name describing the thing
+     * being subscribed to.
+     */
       publish: function(channel) {
         var args = Array.prototype.slice.call(arguments, 1);
-        var liveElements = elementListByClass('subscriber');
+        var liveElements = elementListByClass(subscriberClassName);
         var subscribingElements = _(liveElements).filter(function(el) {
           return el.view
             && el.view.subscriptions
@@ -114,8 +119,22 @@ SOFTWARE.
           return prom;
         });
         return await.all(proms);
+      },
+
+      /**
+       * Set the HTML className used to track views in the
+       * DOM. Useful to avoid naming collisions in case
+       * the default className is used by something else.
+       * @param className - The className string to be set.
+       */
+      setDomTrackingClassName: function(className) {
+        var patt = /[a-z0-9_-]+/i;
+        if (!className || !patt.test(className)) {
+          throw new Error("className doesn't match pattern "+ patt);
+        }
+        subscriberClassName = className;
       }
-    }
+    };
 
     return Backbone.Subscriptions;
   

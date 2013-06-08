@@ -88,6 +88,12 @@ Not only is it a CPU drain, but it's a memory leak, since functions stored on `w
 Also, it's a potential source of non-performance-related bugs if the event handler is non-idempotent.
 Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
 
+## DOM tracking class name
+
+To facilitate lazy discovery of views, each view's `el` is given the class name 'subscriber'. In cases where this causes collisions with existing HTML classes of the same name, the following method can be called when your app first starts:
+
+    Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
+
 ## Browser support
 
 Any browser that supports [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
