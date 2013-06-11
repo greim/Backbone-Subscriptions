@@ -2,7 +2,7 @@
 
 Backbone subscriptions is a Backbone.js extension that provides loosely-coupled, app-wide communication between views, via a publish/subscribe pattern.
 Backbone views are introverts when it comes to event handling.
-They're great at reacting to internally-generated events, but not-so-great at reacting to externally-generated ones.
+They're great at reacting to internally-generated events, but not so great at reacting to externally-generated ones.
 Backbone subscriptions provides a unique and clean solution to this problem.
 
 ## Example
@@ -31,9 +31,9 @@ This is possible because view elements are given the classname 'subscriber'.
 The browser's native DOM engine is then used to locate these elements in a performant manner, by merely looping through a [live NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList#A_.22live.22_collection) on each event.
 This approach gives three main benefits:
 
- 1. Only views present in the live document receive updates from a channel (AKA an event that you can name anything you want).
- 2. Views are naturally GC'd as sections of the DOM are overwritten, eliminating the need to manually unsubscribe from channels or write any other reference maintenance/cleanup code.
- 3. It allows the implementation to be compact and clean.
+ 1. Only views actually in the page (i.e. views that are reachable through the live DOM) receive updates from a "channel" (AKA an event that you can name anything you want).
+ 2. Views are naturally GC'd as sections of the DOM are overwritten, eliminating the need to explicitly unsubscribe from channels or write any other reference maintenance/cleanup code.
+ 3. It allows the implementation to stay compact and clean.
 
 ## API
 
@@ -90,13 +90,13 @@ Ad-hoc code can be written to avoid some of these penalties, but it's a common e
 
 ## DOM tracking class name
 
-To facilitate lazy discovery of views, each view's `el` is given the class name 'subscriber'. In cases where this causes collisions with existing HTML classes of the same name, the following method can be called when your app first starts:
+To facilitate lazy discovery of views, each view's `el` is given the class name "subscriber". In cases where this collides with existing HTML classes, the following method can be called when your app first starts:
 
     Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
 
 ## Browser support
 
-Any browser that supports [`getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
+Any browser that supports [`document.getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`document.querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
 These methods are what enbable it to do lazy view discovery in a performant manner.
 In practical terms, this means that Backbone subscriptions should work in IE8 and above, plus any remotely modern Webkit/Gecko/Presto.
 
