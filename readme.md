@@ -48,7 +48,7 @@ When called, any views that subscribe to that channel, anywhere on the page, are
 ### view.publish(string)
 
 This method is identical to the one above, except that it's called on a view instance, and it only affects descendant views.
-In other words, in the DOM tree, if *viewA.el* contains *viewB.el* but not *viewC.el*, and *viewB* and *viewC* both subscribe to channel *'foo'*, then calling *viewA.publish('foo')* will only notify *viewB*, not *viewC*.
+In other words, in the DOM tree, if viewA.el contains viewB.el but not viewC.el, and viewB and viewC both subscribe to channel 'foo', then calling `viewA.publish('foo')` will only notify viewB, not viewC.
 
 This is only applicable in a nested-view scenario, i.e. when a view instantiates other views and inserts them into its own DOM tree.
 For example, a list view might instantiate and render several item views during render and append them to itself.
@@ -66,6 +66,13 @@ It is passed an event object and any other parameters that were supplied in the 
 
 ### Example
 
+    /* nav.js
+     * ----------------
+     * This navigation menu view is part of a
+     * responsive design that redraws itself
+     * depending on the device size and
+     * orientation.
+     */
     var menu = Backbone.View.extend({
       subscriptions: {
         'orientationchange': 'redraw',
@@ -76,8 +83,12 @@ It is passed an event object and any other parameters that were supplied in the 
       }
     });
 
-    // elsewhere
-
+    /* main.js
+     * ----------------
+     * Declare these event listeners once,
+     * and they'll last for the lifetime of
+     * the app.
+     */
     $(window).on('resize orientationchange', function(ev){
       Backbone.Subscriptions.publish(ev.type);
     });
