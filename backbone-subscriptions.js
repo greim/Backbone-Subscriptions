@@ -93,15 +93,25 @@ SOFTWARE.
       };
     })();
 
+    Function Event(props){
+      _.extend(this, props);
+    }
+
     Backbone.Subscriptions = {
 
-    /**
-     * Publish a message to any subscribing Backbone views.
-     * @param channel - String name describing the thing
-     * being subscribed to.
-     */
+      /**
+       * Publish a message to any subscribing Backbone views.
+       * @param channel - String name describing the thing
+       * being subscribed to.
+       */
       publish: function(channel) {
-        var args = Array.prototype.slice.call(arguments, 1);
+        var event = new Event({
+          channel: channel,
+          view: this instanceof Backbone.View ? this : undefined,
+          context: this
+        });
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = event;
         var liveElements = elementListByClass(subscriberClassName);
         var subscribingElements = _(liveElements).filter(function(el) {
           return el.view
@@ -135,6 +145,8 @@ SOFTWARE.
         subscriberClassName = className;
       }
     };
+
+    Backbone.View.prototype.publish = Backbone.Subscriptions.publish;
 
     return Backbone.Subscriptions;
   
