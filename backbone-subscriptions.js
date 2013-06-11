@@ -61,7 +61,10 @@ SOFTWARE.
       var result = setElement.apply(this, arguments);
       if (this.subscriptions) {
         this.el.view = this;
-        this.el.className += ' ' + subscriberClassName;
+        this.$el.addClass(subscriberClassName);
+      } else {
+        this.el.view = undefined;
+        this.$el.removeClass(subscriberClassName);
       }
       return result;
     };
@@ -97,7 +100,7 @@ SOFTWARE.
       _.extend(this, props);
     }
 
-    Backbone.Subscriptions = {
+    Backbone.Subscriptions = _.extend({
 
       /**
        * Publish a message to any subscribing Backbone views.
@@ -105,10 +108,10 @@ SOFTWARE.
        * being subscribed to.
        */
       publish: function(channel) {
+        var scopeView = this instanceof Backbone.View ? this : undefined;
+        var isGlobal = !scopeView;
         var event = new Event({
-          channel: channel,
-          view: this instanceof Backbone.View ? this : undefined,
-          context: this
+          channel: channel
         });
         var args = Array.prototype.slice.call(arguments);
         args[0] = event;
@@ -116,7 +119,8 @@ SOFTWARE.
         var subscribingElements = _(liveElements).filter(function(el) {
           return el.view
             && el.view.subscriptions
-            && el.view.subscriptions[channel];
+            && el.view.subscriptions[channel]
+            && (!scopeView || $.contains(scopeView.el, el));
         });
         var proms = _(subscribingElements).map(function(el) {
           var view = el.view;
@@ -128,6 +132,9 @@ SOFTWARE.
           }
           return prom;
         });
+        if (isGlobal) {
+          Backbone.Subscriptions.trigger.apply(Backbone.Subscriptions, arguments);
+        }
         return await.all(proms);
       },
 
@@ -144,7 +151,7 @@ SOFTWARE.
         }
         subscriberClassName = className;
       }
-    };
+    }, Backbone.Events);
 
     Backbone.View.prototype.publish = Backbone.Subscriptions.publish;
 

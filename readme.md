@@ -39,39 +39,44 @@ This approach gives three main benefits:
 
 Given that unsubscribing is implicit and no reference cleanup code is needed, the API is rather simple:
 
-### Publishing
+### Backbone.Subscriptions.publish(string)
 
-    /*
-     * arg1 - argN are optional and are passed
-     * to the handler on the view.
-     */
-    Backbone.Subscriptions.publish(channel, arg1, ... argN);
+Publish an event on a "channel" (AKA an event with a name of your choosing) identified by the given string.
+Subsequent arguments are optional, and are passed along to subscribing methods.
+When called, any views that subscribe to that channel, anywhere on the page, are notified.
 
-Alternatively:
+### view.publish(string)
 
-    // inside a backbone view
-    this.publish(channel, arg1, ... argN);
+This method is identical to the one above, except that only descendent views are notified.
+In other words, in the DOM tree, if `viewA.el` contains `viewB.el`, but not `viewC.el`, and `viewB` and `viewC` both subscribe to `'foo'`, then calling `viewA.publish('foo')` will only notify `viewB`, not `viewC`.
+This is only applicable if/when views instantiate other views and insert them into their own DOM subtree.
 
-### Subscribing
+### view.subscriptions
 
-    Backbone.View.extend({
+This is a map keyed by channel name and valued by method names.
+It's similar to the existing events object on Backbone views.
 
-      /*
-       * Subscribe to as many "channels"
-       * (named events) as you want.
-       */
+### view.method(event)
+
+This is a method on your view that runs whenever a notification comes in over a channel.
+It is passed an event object and any other parameters that were supplied in the call to the publish method.
+
+### Example
+
+    var menu = Backbone.View.extend({
       subscriptions: {
-        channel: method
-        ...
+        'orientationchange': 'redraw',
+        'resize': 'redraw'
       },
-
-      /*
-       * A method, just like any other
-       * Backbone view method.
-       */
-      method: function(event, arg1, ... argN) {
-        ...
+      redraw: function(ev) {
+        console.log('redrawing menu in response to ' + ev.channel);
       }
+    });
+
+    // elsewhere
+
+    $(window).on('resize orientationchange', function(ev){
+      Backbone.Subscriptions.publish(ev.type);
     });
 
 ## Why not just add events in initialize?
@@ -80,10 +85,10 @@ Alternatively:
       initialize: function(){
         window.addEventListener('message', _.bind(function(ev){
           var message = JSON.parse(ev.data);
-          this.message(message);
+          this.handleMessage(message);
         }, this));
       },
-      message: function(message){ ... }
+      handleMessage: function(message){ ... }
     });
 
 This is a classic anti-pattern in Backbone development.
