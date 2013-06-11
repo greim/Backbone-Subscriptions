@@ -64,7 +64,7 @@ It's similar to the existing events object on Backbone views.
 This is a method on your view that runs whenever a notification comes in over a channel.
 It is passed an event object and any other parameters that were supplied in the call to the publish method.
 
-### Example 1
+### Example 1: Responsive views
 
     /* nav.js
      * ----------------
@@ -93,7 +93,7 @@ It is passed an event object and any other parameters that were supplied in the 
       Backbone.Subscriptions.publish(ev.type);
     });
 
-### Example 2
+### Example 2: "Collapse all" button
 
     /* list.js
      * ----------------
