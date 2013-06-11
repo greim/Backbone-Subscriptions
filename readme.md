@@ -42,10 +42,15 @@ Given that unsubscribing is implicit and no reference cleanup code is needed, th
 ### Publishing
 
     /*
-     * arg1 - N are optional and are passed
+     * arg1 - argN are optional and are passed
      * to the handler on the view.
      */
     Backbone.Subscriptions.publish(channel, arg1, ... argN);
+
+Alternatively:
+
+    // inside a backbone view
+    this.publish(channel, arg1, ... argN);
 
 ### Subscribing
 
