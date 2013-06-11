@@ -7,17 +7,19 @@ Backbone subscriptions provides a unique and clean solution to this problem.
 
 ## Example
 
-    // an event that originates at the global level
-    window.addEventListener('message', function(ev){
-      var message = JSON.parse(ev.data);
-      Backbone.Subscriptions.publish('message', message);
-    });
+```javascript
+// an event that originates at the global level
+window.addEventListener('message', function(ev){
+  var message = JSON.parse(ev.data);
+  Backbone.Subscriptions.publish('message', message);
+});
 
-    // a view that subscribes to that event
-    var MyView = Backbone.View.extend({
-      subscriptions: { 'message': 'handleMessage' },
-      handleMessage: function(event, message){ ... }
-    });
+// a view that subscribes to that event
+var MyView = Backbone.View.extend({
+  subscriptions: { 'message': 'handleMessage' },
+  handleMessage: function(event, message){ ... }
+});
+```
 
 The above shows an example of making a view respond to cross-window communication messages originating at `window`.
 Similar use cases include subscribing to page visibility or focus changes, device orientation changes, window resize, incoming data from websockets, window scroll, local storage mutations, etc.
@@ -83,7 +85,6 @@ var Menu = Backbone.View.extend({
     console.log('redrawing menu in response to ' + ev.channel);
   }
 });
-```
 
 /* main.js
  * ----------------
@@ -94,47 +95,52 @@ var Menu = Backbone.View.extend({
 $(window).on('resize orientationchange', function(ev){
   Backbone.Subscriptions.publish(ev.type);
 });
+```
 
 ### Example 2: "Collapse all" button
 
-    /* list.js
-     * ----------------
-     * A list of items that can be individually
-     * expanded, plus a "collapse all" button.
-     */
-    var List = Backbone.View.extend({
-      tagName: 'ul',
-      events: {
-        'click button.collapse-all': 'collapseAll'
-      },
-      collapseAll: function(ev) {
-        this.publish('collapse-all');
-      },
-      render: function(){
-        this.collection.each(function(model){
-          this.el.append(new Item({model:model}));
-        }, this);
-      }
-    });
+```javascript
+/* list.js
+ * ----------------
+ * A list of items that can be individually
+ * expanded, plus a "collapse all" button.
+ */
+var List = Backbone.View.extend({
+  tagName: 'ul',
+  events: {
+    'click button.collapse-all': 'collapseAll'
+  },
+  collapseAll: function(ev) {
+    this.publish('collapse-all');
+  },
+  render: function(){
+    this.collection.each(function(model){
+      this.el.append(new Item({model:model}));
+    }, this);
+  }
+});
 
-    /* item.js
-     * ----------------
-     * A single item within a list view.
-     */
-    var Item = Backbone.View.extend({
-      subscriptions: {
-        'collapse-all': 'collapse'
-      },
-      collapse: function(ev) {
-        this.$el.removeClass('expanded');
-      }
-    });
+/* item.js
+ * ----------------
+ * A single item within a list view.
+ */
+var Item = Backbone.View.extend({
+  subscriptions: {
+    'collapse-all': 'collapse'
+  },
+  collapse: function(ev) {
+    this.$el.removeClass('expanded');
+  }
+});
+```
 
 ## DOM tracking class name
 
 To facilitate the discovery of views at runtime, each view's `el` is given the class name "subscriber". In cases where this collides with existing HTML classes, the following method can be called when your app first starts:
 
-    Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
+```javascript
+Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
+```
 
 ## Browser support
 
@@ -146,12 +152,14 @@ In practical terms, this means that Backbone subscriptions should work in IE8 an
 
 This library creates `Backbone.Subscriptions`. If AMD/RequireJS exists, this object is also what is exported into AMD's registry.
 
-    define([
-      'backbone',
-      'backbone-subscriptions'
-    ], function(
-      Backbone,
-      subs
-    ){
-      alert(subs === Backbone.Subscriptions); // true
-    });
+```javascript
+define([
+  'backbone',
+  'backbone-subscriptions'
+], function(
+  Backbone,
+  subs
+){
+  alert(subs === Backbone.Subscriptions); // true
+});
+```
