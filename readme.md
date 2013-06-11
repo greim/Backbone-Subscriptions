@@ -64,7 +64,7 @@ It's similar to the existing events object on Backbone views.
 This is a method on your view that runs whenever a notification comes in over a channel.
 It is passed an event object and any other parameters that were supplied in the call to the publish method.
 
-### Example
+### Example 1
 
     /* nav.js
      * ----------------
@@ -73,7 +73,7 @@ It is passed an event object and any other parameters that were supplied in the 
      * depending on the device size and
      * orientation.
      */
-    var menu = Backbone.View.extend({
+    var Menu = Backbone.View.extend({
       subscriptions: {
         'orientationchange': 'redraw',
         'resize': 'redraw'
@@ -93,28 +93,44 @@ It is passed an event object and any other parameters that were supplied in the 
       Backbone.Subscriptions.publish(ev.type);
     });
 
-## Why not just add events in initialize?
+### Example 2
 
-    var MyView = Backbone.View.extend({
-      initialize: function(){
-        window.addEventListener('message', _.bind(function(ev){
-          var message = JSON.parse(ev.data);
-          this.handleMessage(message);
-        }, this));
+    /* list.js
+     * ----------------
+     * A list of items that can be individually
+     * expanded, plus a "collapse all" button.
+     */
+    var List = Backbone.View.extend({
+      tagName: 'ul',
+      events: {
+        'click button.collapse-all': 'collapseAll'
       },
-      handleMessage: function(message){ ... }
+      collapseAll: function(ev) {
+        this.publish('collapse-all');
+      },
+      render: function(){
+        this.collection.each(function(model){
+          this.el.append(new Item({model:model}));
+        }, this);
+      }
     });
 
-This is a classic anti-pattern in Backbone development.
-It works, but it adds a separate event handler to `window` every time a new view is created.
-Each of these continues to run in the background forever, even if the view is no longer present in the DOM.
-Not only is it a CPU drain, but it's a memory leak, since functions stored on `window` (the event handlers) maintain reference chains back to every view instance ever created.
-Also, it's a potential source of non-performance-related bugs if the event handler is non-idempotent.
-Ad-hoc code can be written to avoid some of these penalties, but it's a common enough problem to merit a clean, reusable solution.
+    /* item.js
+     * ----------------
+     * A single item within a list view.
+     */
+    var Item = Backbone.View.extend({
+      subscriptions: {
+        'collapse-all': 'collapse'
+      },
+      collapse: function(ev) {
+        this.$el.removeClass('expanded');
+      }
+    });
 
 ## DOM tracking class name
 
-To facilitate lazy discovery of views, each view's `el` is given the class name "subscriber". In cases where this collides with existing HTML classes, the following method can be called when your app first starts:
+To facilitate the discovery of views at runtime, each view's `el` is given the class name "subscriber". In cases where this collides with existing HTML classes, the following method can be called when your app first starts:
 
     Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
 
