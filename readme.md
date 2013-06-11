@@ -16,7 +16,7 @@ Backbone subscriptions provides a unique and clean solution to this problem.
     // a view that subscribes to that event
     var MyView = Backbone.View.extend({
       subscriptions: { 'message': 'handleMessage' },
-      handleMessage: function(message){ ... }
+      handleMessage: function(event, message){ ... }
     });
 
 The above shows an example of making a view respond to cross-window communication messages originating at `window`.
@@ -64,7 +64,7 @@ Given that unsubscribing is implicit and no reference cleanup code is needed, th
        * A method, just like any other
        * Backbone view method.
        */
-      method: function(arg1, ... argN) {
+      method: function(event, arg1, ... argN) {
         ...
       }
     });
