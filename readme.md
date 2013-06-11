@@ -66,32 +66,34 @@ It is passed an event object and any other parameters that were supplied in the 
 
 ### Example 1: Responsive views
 
-    /* nav.js
-     * ----------------
-     * This navigation menu view is part of a
-     * responsive design that redraws itself
-     * depending on the device size and
-     * orientation.
-     */
-    var Menu = Backbone.View.extend({
-      subscriptions: {
-        'orientationchange': 'redraw',
-        'resize': 'redraw'
-      },
-      redraw: function(ev) {
-        console.log('redrawing menu in response to ' + ev.channel);
-      }
-    });
+```javascript
+/* nav.js
+ * ----------------
+ * This navigation menu view is part of a
+ * responsive design that redraws itself
+ * depending on the device size and
+ * orientation.
+ */
+var Menu = Backbone.View.extend({
+  subscriptions: {
+    'orientationchange': 'redraw',
+    'resize': 'redraw'
+  },
+  redraw: function(ev) {
+    console.log('redrawing menu in response to ' + ev.channel);
+  }
+});
+```
 
-    /* main.js
-     * ----------------
-     * Declare these event listeners once,
-     * and they'll last for the lifetime of
-     * the app.
-     */
-    $(window).on('resize orientationchange', function(ev){
-      Backbone.Subscriptions.publish(ev.type);
-    });
+/* main.js
+ * ----------------
+ * Declare these event listeners once,
+ * and they'll last for the lifetime of
+ * the app.
+ */
+$(window).on('resize orientationchange', function(ev){
+  Backbone.Subscriptions.publish(ev.type);
+});
 
 ### Example 2: "Collapse all" button
 
