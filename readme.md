@@ -36,7 +36,7 @@ This approach gives several benefits:
 
 ### `Backbone.Subscriptions.publish(string)`
 
-Publish an event on a channel—AKA an event with a name of your choosing—identified by the given string.
+Publish an event on a channel—AKA an arbitrary name of your choosing—identified by the given string.
 Subsequent arguments are optional, and are passed along to subscribing methods.
 When called, any views that subscribe to that channel, anywhere on the page, are notified.
 
