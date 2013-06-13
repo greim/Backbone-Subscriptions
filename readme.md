@@ -9,6 +9,7 @@ Backbone subscriptions makes it easy to compose Backbone views into large applic
  * Ability to publish information to only views nested within a given containing view.
  * Ability for views to subscribe to as many channels—AKA events—as they want.
  * Only views that are live in the DOM receive notifications.
+ * Anything can broadcast information to views, not just other views.
  * Unsubscription is implicit; eliminating worry about memory leaks and zombie views.
 
 ## Core concepts
@@ -94,7 +95,7 @@ Backbone.Subscriptions.publish('foo', 'x', true); // won't be handled by above
 
 #### Handler methods
 
-handler methods are plain old view methods like any other backbone view method.
+Handler methods are plain old view methods like any other backbone view method.
 They get passed an event object as the first parameter.
 Any subsequent arguments are passed along as well.
 
