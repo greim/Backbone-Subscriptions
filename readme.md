@@ -66,6 +66,8 @@ var MyView = Backbone.View.extend({
 });
 ```
 
+#### Channel filtering
+
 Optionally, channels may be filtered by passing param type.
 
 ```javascript
@@ -86,10 +88,11 @@ Backbone.Subscriptions.publish('foo', 'x', 'y'); // will be handled by above
 Backbone.Subscriptions.publish('foo', 'x', true); // won't be handled by above
 ```
 
-### `view.method(event)`
+#### Handler methods
 
-Handlers for channel events are just plain old Backbone view methods.
-It gets passed an event object and any other parameters that were supplied in the call to the publish method.
+handler methods are plain old view methods like any other backbone view method.
+They get passed an event object as the first parameter.
+Any subsequent arguments are passed along as well.
 
 ## Use case examples
 
