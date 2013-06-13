@@ -1,6 +1,6 @@
 # Loosely-coupled, DOM-based, app-wide, cross-view communication for Backbone
 
-Backbone subscriptions makes it easy to compose Backbone views into large applications via *cross-view communication*.
+Backbone subscriptions makes it easy to compose Backbone views into large applications by allowing *cross-view communication*.
 
 ## Features
 
@@ -16,9 +16,9 @@ Backbone subscriptions makes it easy to compose Backbone views into large applic
 ### Memory leaks and zombie views
 
 Event handling in JS requires a reference chain from the listenee back to the listener.
-This poses problems for views that want to communicate in arbitrary ways using events.
+This poses problems for views that want to communicate using events.
 When a reference chain leads back to a view, that view isn't garbage collected, causing a memory leak.
-In addition, it becomes a zombie view, continuing to respond to events long after its `el` is removed from the live DOM.
+In addition, it becomes a "zombie view", continuing to respond to events long after its `el` is removed from the page.
 If you care about performance at all, this drastically complicates the use of events.
 
 ### DOM as system of record
@@ -36,43 +36,48 @@ This approach gives several benefits:
 
 ### `Backbone.Subscriptions.publish(string)`
 
-Publish an event on a channel—AKA an arbitrary name of your choosing—identified by the given string.
+Call this method to publish an event on a channel.
+A channel is just a named event, and is identified by the given string.
 Subsequent arguments are optional, and are passed along to subscribing methods.
 When called, any views that subscribe to that channel, anywhere on the page, are notified.
 
-### `view.publish(string)`
+### `Backbone.View.prototype.publish(string)`
 
-This method is identical to the one above, except that it's called on a view instance, and it only affects descendant views.
+This method is identical to the one above, except that it's called on a view instance, and only affects nested views.
 In other words, in the DOM tree, if viewA.el contains viewB.el but not viewC.el, and viewB and viewC both subscribe to channel 'foo', then calling `viewA.publish('foo')` will only notify viewB, not viewC.
 
 This is only applicable in a nested-view scenario, i.e. when a view instantiates other views and inserts them into its own DOM tree.
 For example, a list view might instantiate and render several item views during render and append them to itself.
 If the list view provides a 'collapse all' button, it might do `this.publish('collapse')` in order to notify only its own item views that they're supposed to collapse.
 
-### `view.subscriptions`
+### `MyView.prototype.subscriptions`
 
-This is a string:string map where keys are channels and values are method names.
+This is a &lt;string, string&gt; map where keys are channels and values are the names of methods declared on that view.
 It's similar to the existing events object on Backbone views, and looks like this:
 
 ```javascript
-subscriptions: {
-  'foo': 'bar'
-},
-bar: function() {
-  ...
-}
+var MyView = Backbone.View.extend({
+  subscriptions: {
+    'foo': 'bar'
+  },
+  bar: function() {
+    ...
+  }
+});
 ```
 
 Optionally, channels may be filtered by passing param type.
 
 ```javascript
-subscriptions: {
-  'foo (string, string)': 'bar'
-},
-bar: function(ev, s1, s2) {
-  alert(typeof s1 === 'string'); // true
-  alert(typeof s2 === 'string'); // true
-}
+var MyView = Backbone.View.extend({
+  subscriptions: {
+    'foo (string, string)': 'bar'
+  },
+  bar: function(ev, s1, s2) {
+    alert(typeof s1 === 'string'); // true
+    alert(typeof s2 === 'string'); // true
+  }
+});
 
 // elsewhere
 
@@ -86,9 +91,9 @@ Backbone.Subscriptions.publish('foo', 'x', true); // won't be handled by above
 Handlers for channel events are just plain old Backbone view methods.
 It gets passed an event object and any other parameters that were supplied in the call to the publish method.
 
-## Use cases
+## Use case examples
 
-### Use case 1: responsive views
+### Example 1: Responsive views
 
 ```javascript
 /* main.js
@@ -118,7 +123,7 @@ var Menu = Backbone.View.extend({
 });
 ```
 
-### Use case 2: "collapse all" button
+### Example 2: Collapse-all button
 
 ```javascript
 /* list.js
