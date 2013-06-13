@@ -96,9 +96,67 @@ SOFTWARE.
       };
     })();
 
-    Function Event(props){
+    function Event(props){
       _.extend(this, props);
     }
+
+    var getChannelFilter = (function(){
+      /*
+       * A view declares which events it wants to handle in
+       * its subscriptions:{key:value} object. The key is a
+       * string like 'foo (string, number)'. This class
+       * represents the parsed version of that key, and is
+       * used to select which events a view responds to,
+       * based on the channel name and argument list
+       * provided by the caller.
+       */
+      function ChannelFilter(filterString){
+        var matches = filterString.match(patts.sig);
+        if (!matches) {
+          this.sigString = null;
+          this.channel = filterString || null;
+        } else {
+          this.channel = matches[1] || null;
+          var commaSep = matches[2];
+          var sigString = _(commaSep.split(',')).map(trim);
+          sigString = _(sigString).filter(function(part){
+            return patts.notEmpty.test(part);
+          });
+          this.sigString = sigString.join(',');
+        }
+      }
+      ChannelFilter.prototype.test = function(callerChan, callerSig){
+        var result = true;
+        if (this.channel !== null) {
+          result &= this.channel === callerChan;
+        }
+        if (this.sigString !== null) {
+          var callerSigString = callerSig.map(function(arg){
+            return typeof arg;
+          }).join(',');
+          result &= callerSigString === this.sigString;
+        }
+        return !!result;
+      };
+      function trim(s){
+        return patts.leadingTrailing.test(s)
+          ? s.replace(patts.leadingTrailing,'')
+          : s;
+      }
+      var channelFilters = {};
+      var patts = {
+        sig: /^\s*([^\(]*?)\s*\(([^\)]*)\)\s*$/,
+        leadingTrailing: /(^\s+)|(\s+$)/g,
+        notEmpty: /\S/
+      };
+      return function(filterString){
+        var filter = channelFilters[filterString];
+        if (!filter) {
+          filter = channelFilters[filterString] = new ChannelFilter(filterString);
+        }
+        return filter;
+      }
+    })();
 
     Backbone.Subscriptions = _.extend({
 
@@ -113,27 +171,32 @@ SOFTWARE.
         var event = new Event({
           channel: channel
         });
-        var args = Array.prototype.slice.call(arguments);
-        args[0] = event;
+        var sig = Array.prototype.slice.call(arguments, 1);
+        var args = sig.slice();
+        args.unshift(event);
         var liveElements = elementListByClass(subscriberClassName);
-        var subscribingElements = _(liveElements).filter(function(el) {
-          return el.view
-            && el.view.subscriptions
-            && el.view.subscriptions[channel]
-            && (!scopeView || $.contains(scopeView.el, el));
-        });
-        var proms = _(subscribingElements).map(function(el) {
+
+        var proms = [];
+        _(liveElements).each(function(el){
+          if (!el.view) return;
+          if (!el.view.subscriptions) return;
           var view = el.view;
           var subs = view.subscriptions;
-          var methodName = subs[channel];
-          var prom = view[methodName].apply(view, args);
-          if (!(prom instanceof await)) {
-            prom = await();
-          }
-          return prom;
+          _(_(subs).keys()).each(function(filterString){
+            var filter = getChannelFilter(filterString);
+            if (filter.test(channel, sig)) {
+              if (!scopeView || $.contains(scopeView.el, el)) {
+                var prom = view[subs[filterString]].apply(view, args);
+                if (!(prom instanceof await)) {
+                  prom = await();
+                }
+                proms.push(prom);
+              }
+            }
+          });
         });
         if (isGlobal) {
-          Backbone.Subscriptions.trigger.apply(Backbone.Subscriptions, arguments);
+          Backbone.Subscriptions.trigger.apply(Backbone.Subscriptions, sig);
         }
         return await.all(proms);
       },

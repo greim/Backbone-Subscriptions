@@ -51,12 +51,39 @@ If the list view provides a 'collapse all' button, it might do `this.publish('co
 
 ### `view.subscriptions`
 
-This is a string:string map where keys are channel names and values are method names.
-It's similar to the existing events object on Backbone views.
+This is a string:string map where keys are channels and values are method names.
+It's similar to the existing events object on Backbone views, and looks like this:
+
+```javascript
+subscriptions: {
+  'foo': 'bar'
+},
+bar: function() {
+  ...
+}
+```
+
+Optionally, channels may be filtered by passing param type.
+
+```javascript
+subscriptions: {
+  'foo (string, string)': 'bar'
+},
+bar: function(ev, s1, s2) {
+  alert(typeof s1 === 'string'); // true
+  alert(typeof s2 === 'string'); // true
+}
+
+// elsewhere
+
+Backbone.Subscriptions.publish('foo'); // won't be handled by above
+Backbone.Subscriptions.publish('foo', 'x', 'y'); // will be handled by above
+Backbone.Subscriptions.publish('foo', 'x', true); // won't be handled by above
+```
 
 ### `view.method(event)`
 
-This is a method on your view that runs whenever a notification comes in over a channel.
+Handlers for channel events are just plain old Backbone view methods.
 It gets passed an event object and any other parameters that were supplied in the call to the publish method.
 
 ## Use cases
@@ -112,7 +139,7 @@ var List = Backbone.View.extend({
   },
   render: function(){
     this.collection.each(function(model){
-      this.el.append(new Item({model:model}));
+      this.el.append(new Item({model:model}).el);
     }, this);
   }
 });
@@ -122,6 +149,7 @@ var List = Backbone.View.extend({
  * A single item within a list view.
  */
 var Item = Backbone.View.extend({
+  tagName: 'li',
   subscriptions: {
     'collapse-all': 'collapse'
   },

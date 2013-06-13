@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mocha Tests</title>
+<link rel="stylesheet" href="mocha.css">
+</head>
+<body>
+<div style="position:fixed;top:-10000px" id="catcher"></div>
+<div id="mocha"></div>
+<script src="jquery.js"></script>
+<script src="underscore.js"></script>
+<script src="backbone.js"></script>
+<script src="../backbone-subscriptions.js"></script>
+<script src="expect.js"></script>
+<script src="mocha.js"></script>
+<script>mocha.setup('bdd')</script>
+
+<script>
+
+function assert(x){
+  if (!x) {
+    throw new Error('assertion error');
+  }
+}
+
+var TestView1 = Backbone.View.extend({
+  subscriptions: {
+    'foo': 'foo'
+  },
+  foo: function() {
+    this.trigger('foo');
+  },
+  insert: function(el){
+    this.$el.append(el);
+  }
+});
+var TestView2 = Backbone.View.extend({
+  subscriptions: {
+    'foo ()': 'foo',
+    'bar (string)': 'bar',
+    'baz (number, boolean)': 'baz',
+    'qux(number,boolean)': 'qux',
+    '  wob   ( number  ,  boolean  )  ': 'wob'
+  },
+  foo: function() { this.trigger('foo'); },
+  bar: function() { this.trigger('bar'); },
+  baz: function() { this.trigger('baz'); },
+  qux: function() { this.trigger('qux'); },
+  wob: function() { this.trigger('wob'); },
+  insert: function(el){
+    this.$el.append(el);
+  }
+});
+
+describe('global publish', function(){
+  it('should not work before view is live', function(){
+    var fake = new TestView1();
+    var worked = true;
+    fake.on('foo', function(){ worked = false; });
+    Backbone.Subscriptions.publish('foo');
+    assert(worked);
+  })
+  it('should work while view is live', function(){
+    var fake = new TestView1();
+    var worked = false;
+    fake.on('foo', function(){ worked = true; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('foo');
+    assert(worked);
+  })
+  it('should not work after view is live', function(){
+    var fake = new TestView1();
+    var worked = true;
+    fake.on('foo', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    $('#catcher').html('');
+    Backbone.Subscriptions.publish('foo');
+    assert(worked);
+  })
+})
+describe('contextual publish', function(){
+  it('should not work before view is live', function(){
+    var fake1 = new TestView1();
+    var fake2 = new TestView1();
+    fake1.insert(fake2.el);
+    var worked = true;
+    fake2.on('foo', function(){ worked = false; });
+    fake1.publish('foo');
+    assert(worked);
+  })
+  it('should work while view is live', function(){
+    var fake1 = new TestView1();
+    var fake2 = new TestView1();
+    fake1.insert(fake2.el);
+    var worked = false;
+    fake2.on('foo', function(){ worked = true; });
+    $('#catcher').html(fake1.el);
+    fake1.publish('foo');
+    assert(worked);
+  })
+  it('should not work after view is live', function(){
+    var fake1 = new TestView1();
+    var fake2 = new TestView1();
+    fake1.insert(fake2.el);
+    var worked = true;
+    fake2.on('foo', function(){ worked = false; });
+    $('#catcher').html(fake1.el);
+    $('#catcher').html('');
+    fake1.publish('foo');
+    assert(worked);
+  })
+})
+describe('content filtering', function(){
+  it('should accept matching-length empty signature', function(){
+    var fake = new TestView2();
+    var worked = false;
+    fake.on('foo', function(){ worked = true; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('foo');
+    assert(worked);
+  })
+  it('should reject non-matching-length empty signature', function(){
+    var fake = new TestView2();
+    var worked = true;
+    fake.on('foo', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('foo', 0);
+    assert(worked);
+  })
+  it('should accept matching one-length signature', function(){
+    var fake = new TestView2();
+    var worked = false;
+    fake.on('bar', function(){ worked = true; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('bar', '');
+    assert(worked);
+  })
+  it('should reject non-matching-type one-length signature', function(){
+    var fake = new TestView2();
+    var worked = true;
+    fake.on('bar', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('bar', {});
+    Backbone.Subscriptions.publish('bar', true);
+    Backbone.Subscriptions.publish('bar', 0);
+    assert(worked);
+  })
+  it('should reject non-matching-length one-length signature', function(){
+    var fake = new TestView2();
+    var worked = true;
+    fake.on('bar', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('bar', '', 0);
+    Backbone.Subscriptions.publish('bar');
+    assert(worked);
+  })
+  it('should accept matching two-length signature', function(){
+    var fake = new TestView2();
+    var worked = false;
+    fake.on('baz', function(){ worked = true; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('baz', 1, false);
+    assert(worked);
+  })
+  it('should reject non-matching-type two-length signature', function(){
+    var fake = new TestView2();
+    var worked = true;
+    fake.on('baz', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('baz', 1, null);
+    Backbone.Subscriptions.publish('baz', 'true', true);
+    Backbone.Subscriptions.publish('baz', {}, {});
+    assert(worked);
+  })
+  it('should reject non-matching-length two-length signature', function(){
+    var fake = new TestView2();
+    var worked = true;
+    fake.on('baz', function(){ worked = false; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('baz');
+    Backbone.Subscriptions.publish('baz', .1);
+    Backbone.Subscriptions.publish('baz', 0.44, true, 'x');
+    assert(worked);
+  })
+  it('should ignore extra whitespace in filter string', function(){
+    var fake = new TestView2();
+    var worked = false;
+    fake.on('wob', function(){ worked = true; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('wob', 1, false);
+    assert(worked);
+  })
+})
+
+</script>
+<script>
+mocha.checkLeaks();
+mocha.globals(['jQuery']);
+mocha.run();
+</script>
+</body>
+</html>
