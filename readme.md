@@ -68,7 +68,7 @@ var MyView = Backbone.View.extend({
 
 #### Channel filtering
 
-Optionally, channels may be filtered by passing param type.
+Optionally, channels may be filtered by argument list length and type.
 
 ```javascript
 var MyView = Backbone.View.extend({

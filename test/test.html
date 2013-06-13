@@ -26,10 +26,14 @@ function assert(x){
 
 var TestView1 = Backbone.View.extend({
   subscriptions: {
-    'foo': 'foo'
+    'foo': 'foo',
+    'bar': 'bar'
   },
   foo: function() {
-    this.trigger('foo');
+    this.trigger('foo', this);
+  },
+  bar: function(ev,x,y,z) {
+    this.trigger('bar',ev,x,y,z);
   },
   insert: function(el){
     this.$el.append(el);
@@ -109,6 +113,45 @@ describe('contextual publish', function(){
     $('#catcher').html('');
     fake1.publish('foo');
     assert(worked);
+  })
+  it('should only publish to nested views', function(){
+    var fake1 = new TestView1();
+    var fake2 = new TestView1();
+    var fake3 = new TestView1();
+    fake1.insert(fake2.el);
+    var worked1 = false;
+    var worked2 = true;
+    fake2.on('foo', function(){ worked1 = true; });
+    fake3.on('foo', function(){ worked2 = false; });
+    $('#catcher').html(fake1.el);
+    $('#catcher').append(fake3.el);
+    fake1.publish('foo');
+    assert(worked1);
+    assert(worked2);
+  })
+})
+describe('method calls', function(){
+  it('should set "this" on view method calls correctly', function(){
+    var fake = new TestView1();
+    fake.on('foo', function(theThis){ assert(theThis === fake); });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('foo');
+  })
+  it('should pass an event object to handlers', function(){
+    var fake = new TestView1();
+    fake.on('bar', function(ev){ assert(ev.channel === 'bar'); });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('bar');
+  })
+  it('should pass additional params to handlers', function(){
+    var fake = new TestView1();
+    fake.on('bar', function(ev,x,y,z){
+      assert(x===0);
+      assert(y===1);
+      assert(z===2);
+    });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('bar',0,1,2);
   })
 })
 describe('content filtering', function(){
