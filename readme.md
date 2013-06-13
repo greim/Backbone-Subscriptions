@@ -58,12 +58,16 @@ It's similar to the existing events object on Backbone views, and looks like thi
 ```javascript
 var MyView = Backbone.View.extend({
   subscriptions: {
-    'foo': 'bar'
+    'foo': 'handleFoo'
   },
-  bar: function() {
+  handleFoo: function() {
     ...
   }
 });
+
+// elsewhere
+
+Backbone.Subscriptions.publish('foo');
 ```
 
 #### Channel filtering
@@ -73,9 +77,9 @@ Optionally, channels may be filtered by argument list length and type.
 ```javascript
 var MyView = Backbone.View.extend({
   subscriptions: {
-    'foo (string, string)': 'bar'
+    'foo (string, string)': 'handleFoo'
   },
-  bar: function(ev, s1, s2) {
+  handleFoo: function(ev, s1, s2) {
     alert(typeof s1 === 'string'); // true
     alert(typeof s2 === 'string'); // true
   }
