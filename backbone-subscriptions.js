@@ -35,19 +35,17 @@ SOFTWARE.
    */
   var isAmd = typeof window.define === "function" && window.define.amd;
   var define = isAmd ? window.define : function(list, cb) {
-    cb(jQuery, Backbone, _, window.await);
+    cb(jQuery, Backbone, _);
   };
 
   define([
     'jquery',
     'backbone',
-    'underscore',
-    'await'
+    'underscore'
   ],function(
     $,
     Backbone,
-    _,
-    await
+    _
   ) {
 
     var subscriberClassName = 'subscriber';
@@ -68,11 +66,6 @@ SOFTWARE.
       }
       return result;
     };
-
-    if (!await) {
-      await = function(){};
-      await.all = function(){};
-    }
 
     /*
      * Returns a list of elements by class name. Uses native
@@ -179,7 +172,6 @@ SOFTWARE.
         args.unshift(event);
         var liveElements = elementListByClass(subscriberClassName);
 
-        var proms = [];
         _(liveElements).each(function(el){
           if (!el.view) return;
           if (!el.view.subscriptions) return;
@@ -189,11 +181,7 @@ SOFTWARE.
             var filter = getChannelFilter(filterString);
             if (filter.test(channel, sig)) {
               if (!scopeView || $.contains(scopeView.el, el)) {
-                var prom = view[subs[filterString]].apply(view, args);
-                if (!(prom instanceof await)) {
-                  prom = await();
-                }
-                proms.push(prom);
+                view[subs[filterString]].apply(view, args);
               }
             }
           });
@@ -201,7 +189,6 @@ SOFTWARE.
         if (isGlobal) {
           Backbone.Subscriptions.trigger.apply(Backbone.Subscriptions, sig);
         }
-        return await.all(proms);
       },
 
       /**
