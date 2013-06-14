@@ -1,4 +1,4 @@
-# Loosely-coupled, DOM-based, app-wide, cross-view communication for Backbone
+# Cross-view communication for Backbone
 
 Backbone subscriptions makes it easy to compose Backbone views into large applications by allowing *cross-view communication*.
 
