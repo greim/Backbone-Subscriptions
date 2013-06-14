@@ -13,7 +13,7 @@ Backbone subscriptions makes it easy to compose Backbone views into large applic
 
 ## Dependencies
 
-The only dependencies are Backbone 1.0 and whatever things that Backbone in turn depends on. I haven't tested against previous versions of Backbone, so it may or may not work.
+The only dependencies are Backbone and whatever things that Backbone in turn depends on. Test coverage is based on Backbone 1.0.
 
 ## Browser support
 
