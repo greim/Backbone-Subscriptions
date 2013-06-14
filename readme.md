@@ -66,14 +66,14 @@ This approach gives several benefits:
 
 # API
 
-## `Backbone.Subscriptions.publish(string)`
+## Backbone.Subscriptions.publish(string)
 
 Call this method to publish to a channel.
 A channel is just a named event, and is identified by the given string.
 Subsequent arguments are optional, and are passed along to subscribing methods.
 When called, any views that subscribe to that channel, anywhere on the page, are notified.
 
-## `Backbone.View.prototype.publish(string)`
+## Backbone.View.prototype.publish(string)
 
 This method is identical to the one above, except that it's called on a view instance, and only affects nested views.
 In other words, in the DOM tree, if viewA.el contains viewB.el but not viewC.el, and viewB and viewC both subscribe to channel 'foo', then calling `viewA.publish('foo')` will only notify viewB, not viewC.
@@ -82,7 +82,7 @@ This is only applicable in a nested-view scenario, i.e. when a view instantiates
 For example, a list view might instantiate and render several item views during render and append them to itself.
 If the list view provides a 'collapse all' button, it might do `this.publish('collapse')` in order to notify only its own item views that they're supposed to collapse.
 
-## `MyView.prototype.subscriptions`
+## MyView.prototype.subscriptions
 
 This is a &lt;string, string&gt; map where keys are channels and values are the names of methods declared on that view.
 It's similar to the existing events object on Backbone views, and looks like this:
@@ -102,7 +102,7 @@ var MyView = Backbone.View.extend({
 Backbone.Subscriptions.publish('foo');
 ```
 
-## `Backbone.Subscriptions.setDomTrackingClassName(string)`
+## Backbone.Subscriptions.setDomTrackingClassName(string)
 
 To facilitate the discovery of views in the DOM, each view's `el` is given the class name "subscriber". In cases where this collides with existing conventions, this method can be called when your app first starts with whatever className you want.
 
