@@ -181,13 +181,17 @@ To facilitate the discovery of views in the DOM, each view's `el` is given the c
 Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
 ```
 
+## Dependencies
+
+The only dependencies are Backbone 1.0 and whatever things that Backbone in turn depends on. I haven't tested against previous versions of Backbone, so it may or may not work.
+
 ## Browser support
 
 Any browser that supports [`document.getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`document.querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
 These methods are what enbable it to find subscribing views in a performant manner.
 In practical terms, this means that Backbone subscriptions works in **IE8 and above**, plus any remotely modern Webkit/Gecko/Presto.
 
-## AMD/RequireJS compatible
+## AMD/RequireJS support
 
 This library creates `Backbone.Subscriptions`. If AMD/RequireJS exists, this object is also what is exported into AMD's registry.
 

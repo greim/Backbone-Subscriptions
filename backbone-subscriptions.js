@@ -35,17 +35,13 @@ SOFTWARE.
    */
   var isAmd = typeof window.define === "function" && window.define.amd;
   var define = isAmd ? window.define : function(list, cb) {
-    cb(jQuery, Backbone, _);
+    cb(Backbone);
   };
 
   define([
-    'jquery',
-    'backbone',
-    'underscore'
+    'backbone'
   ],function(
-    $,
-    Backbone,
-    _
+    Backbone
   ) {
 
     var subscriberClassName = 'subscriber';
@@ -180,7 +176,7 @@ SOFTWARE.
           _(_(subs).keys()).each(function(filterString){
             var filter = getChannelFilter(filterString);
             if (filter.test(channel, sig)) {
-              if (!scopeView || $.contains(scopeView.el, el)) {
+              if (!scopeView || Backbone.$.contains(scopeView.el, el)) {
                 view[subs[filterString]].apply(view, args);
               }
             }
