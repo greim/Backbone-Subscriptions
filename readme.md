@@ -9,7 +9,6 @@ Backbone subscriptions makes it easy to compose Backbone views into large applic
  * Ability to publish information to only views nested within a given containing view.
  * Ability for views to subscribe to as many channels—AKA events—as they want.
  * Only views that are live in the DOM receive notifications.
- * Anything can broadcast information to views, not just other views.
  * Unsubscription is implicit; eliminating worry about memory leaks and zombie views.
 
 ## Core concepts
@@ -28,8 +27,8 @@ In Backbone subscriptions, the reference chain from listenee to listener *is* th
 When an event is published, Backbone subscriptions simply looks at the DOM for any subscribing views.
 This approach gives several benefits:
 
- 1. Browsers' native DOM engines are *fast*, allowing subscribing views to be located with minimal processor overhead.
- 2. Only views that are live in the DOM receive updates from a channel.
+ 1. Only views currently in the page receive updates from a channel.
+ 2. Browsers' native DOM engines are *fast*, allowing subscribing views to be located with minimal processor overhead.
  3. No memory leaks or zombie views. Removing or overwriting sections of DOM doubles as your reference cleanup.
  4. It allows the implementation to stay compact and clean, since reference cleanup and unsuscription logic aren't needed.
 
@@ -37,7 +36,7 @@ This approach gives several benefits:
 
 ### `Backbone.Subscriptions.publish(string)`
 
-Call this method to publish an event on a channel.
+Call this method to publish to a channel.
 A channel is just a named event, and is identified by the given string.
 Subsequent arguments are optional, and are passed along to subscribing methods.
 When called, any views that subscribe to that channel, anywhere on the page, are notified.
@@ -184,7 +183,7 @@ Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
 
 Any browser that supports [`document.getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`document.querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
 These methods are what enbable it to find subscribing views in a performant manner.
-In practical terms, this means that Backbone subscriptions should work in **IE8 and above**, plus any remotely modern Webkit/Gecko/Presto.
+In practical terms, this means that Backbone subscriptions works in **IE8 and above**, plus any remotely modern Webkit/Gecko/Presto.
 
 ## AMD/RequireJS compatible
 
