@@ -45,6 +45,7 @@ var TestView2 = Backbone.View.extend({
     'bar (string)': 'bar',
     'baz (number, boolean)': 'baz',
     'qux(number,boolean)': 'qux',
+    'zeb (number, *)': 'zeb',
     '  wob   ( number  ,  boolean  )  ': 'wob'
   },
   foo: function() { this.trigger('foo'); },
@@ -52,6 +53,7 @@ var TestView2 = Backbone.View.extend({
   baz: function() { this.trigger('baz'); },
   qux: function() { this.trigger('qux'); },
   wob: function() { this.trigger('wob'); },
+  zeb: function() { this.trigger('zeb'); },
   insert: function(el){
     this.$el.append(el);
   }
@@ -233,6 +235,16 @@ describe('content filtering', function(){
     $('#catcher').html(fake.el);
     Backbone.Subscriptions.publish('wob', 1, false);
     assert(worked);
+  })
+  it('should honor wildcards in filter string', function(){
+    var fake = new TestView2();
+    var count = 0;
+    fake.on('zeb', function(){ count++; });
+    $('#catcher').html(fake.el);
+    Backbone.Subscriptions.publish('zeb', 1, false);
+    Backbone.Subscriptions.publish('zeb', 0, null);
+    Backbone.Subscriptions.publish('zeb', 3, 'xyz');
+    assert(count === 3);
   })
 })
 

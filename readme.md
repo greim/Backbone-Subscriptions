@@ -72,24 +72,26 @@ Backbone.Subscriptions.publish('foo');
 
 #### Channel filtering
 
-Optionally, channels may be filtered by argument list length and type.
+Optionally, channels may be filtered by argument list length and typeof.
 
 ```javascript
 var MyView = Backbone.View.extend({
   subscriptions: {
-    'foo (string, string)': 'handleFoo'
-  },
-  handleFoo: function(ev, s1, s2) {
-    alert(typeof s1 === 'string'); // true
-    alert(typeof s2 === 'string'); // true
+
+    // only be notified if caller
+    // passes a string and a number
+    'foo (string, number)': 'foo',
+
+    // only be notified if caller
+    // passes an object and another
+    // argument of any type
+    'bar (object, *)': 'bar',
+
+    // only be notified if caller
+    // passes no args
+    'baz ()': 'baz'
   }
 });
-
-// elsewhere
-
-Backbone.Subscriptions.publish('foo'); // won't be handled by above
-Backbone.Subscriptions.publish('foo', 'x', 'y'); // will be handled by above
-Backbone.Subscriptions.publish('foo', 'x', true); // won't be handled by above
 ```
 
 #### Handler methods

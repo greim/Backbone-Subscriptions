@@ -113,16 +113,16 @@ SOFTWARE.
       function ChannelFilter(filterString){
         var matches = filterString.match(patts.sig);
         if (!matches) {
-          this.sigString = null;
+          this.sig = null;
           this.channel = filterString || null;
         } else {
           this.channel = matches[1] || null;
           var commaSep = matches[2];
-          var sigString = _(commaSep.split(',')).map(trim);
-          sigString = _(sigString).filter(function(part){
+          var sig = _(commaSep.split(',')).map(trim);
+          sig = _(sig).filter(function(part){
             return patts.notEmpty.test(part);
           });
-          this.sigString = sigString.join(',');
+          this.sig = sig;
         }
       }
       ChannelFilter.prototype.test = function(callerChan, callerSig){
@@ -130,11 +130,14 @@ SOFTWARE.
         if (this.channel !== null) {
           result &= this.channel === callerChan;
         }
-        if (this.sigString !== null) {
-          var callerSigString = callerSig.map(function(arg){
-            return typeof arg;
-          }).join(',');
-          result &= callerSigString === this.sigString;
+        if (this.sig !== null) {
+          if (this.sig.length !== callerSig.length) {
+            result = false;
+          } else {
+            _(this.sig).each(function(type, idx){
+              result &= (type === '*' || type === typeof callerSig[idx]);
+            });
+          }
         }
         return !!result;
       };
