@@ -73,14 +73,14 @@ SOFTWARE.
       var useFallback = typeof document.getElementsByClassName !== 'function';
       return function(className) {
         if (useFallback) {
-          return slice.call(document.querySelectorAll('.'+className));
+          return document.querySelectorAll('.'+className);
         } else {
           if (!lists[className]) {
             // gebcn returns a "live" list, so it will be automatically
             // updated by the browser from here on out
             lists[className] = document.getElementsByClassName(className);
           }
-          return slice.call(lists[className]);
+          return lists[className];
         }
       };
     })();
