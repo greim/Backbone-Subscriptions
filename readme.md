@@ -13,16 +13,23 @@ Backbone subscriptions makes it easy to compose Backbone views into large applic
 
 ## Dependencies
 
-The only dependencies are Backbone and whatever things that Backbone in turn depends on. Test coverage is based on Backbone 1.0.
+The only dependencies are Backbone and whatever things Backbone depends on. Test coverage is based on Backbone 1.0.
 
 ## Browser support
 
 Any browser that supports [`document.getElementsByClassName()`](https://developer.mozilla.org/en-US/docs/Web/API/document.getElementsByClassName) or [`document.querySelectorAll()`](http://www.w3.org/TR/selectors-api2/) is supported.
 In practical terms, this means that Backbone subscriptions works in **IE8 and above**, plus any remotely modern Webkit/Gecko/Presto.
 
-## AMD/RequireJS support
+## How to get started
 
-This library creates `Backbone.Subscriptions`. If AMD/RequireJS exists, this object is also what is exported into AMD's registry.
+Simply call the `backbone-subscriptions.js` file onto your page after `backbone.js`.
+
+```html
+<script src="backbone.js"></script>
+<script src="backbone-subscriptions.js"></script>
+```
+
+`Backbone.Subscriptions` will now be available in your JavaScript environment. Optionally, this library can be used with AMD/RequireJS. It automatically detects whether AMD/RequireJS exists, and if so exports itself into AMD's registry, such that:
 
 ```javascript
 define([
@@ -36,9 +43,9 @@ define([
 });
 ```
 
-## Core concepts
+# Core concepts
 
-### Memory leaks and zombie views
+## Memory leaks and zombie views
 
 Event handling in JS requires a reference chain from the listenee back to the listener.
 This poses problems for views that want to communicate using events.
@@ -46,7 +53,7 @@ When a reference chain leads back to a view, that view isn't garbage collected, 
 In addition, it becomes a "zombie view", continuing to respond to events long after its `el` is removed from the page.
 If you care about performance at all, this drastically complicates the use of events.
 
-### DOM as system of record
+## DOM as system of record
 
 In Backbone subscriptions, the reference chain from listenee to listener *is* the DOM.
 When an event is published, Backbone subscriptions simply looks at the DOM for any subscribing views.
@@ -57,16 +64,16 @@ This approach gives several benefits:
  3. No memory leaks or zombie views. Removing or overwriting sections of DOM doubles as your reference cleanup.
  4. It allows the implementation to stay compact and clean, since reference cleanup and unsuscription logic aren't needed.
 
-## API
+# API
 
-### `Backbone.Subscriptions.publish(string)`
+## `Backbone.Subscriptions.publish(string)`
 
 Call this method to publish to a channel.
 A channel is just a named event, and is identified by the given string.
 Subsequent arguments are optional, and are passed along to subscribing methods.
 When called, any views that subscribe to that channel, anywhere on the page, are notified.
 
-### `Backbone.View.prototype.publish(string)`
+## `Backbone.View.prototype.publish(string)`
 
 This method is identical to the one above, except that it's called on a view instance, and only affects nested views.
 In other words, in the DOM tree, if viewA.el contains viewB.el but not viewC.el, and viewB and viewC both subscribe to channel 'foo', then calling `viewA.publish('foo')` will only notify viewB, not viewC.
@@ -75,7 +82,7 @@ This is only applicable in a nested-view scenario, i.e. when a view instantiates
 For example, a list view might instantiate and render several item views during render and append them to itself.
 If the list view provides a 'collapse all' button, it might do `this.publish('collapse')` in order to notify only its own item views that they're supposed to collapse.
 
-### `MyView.prototype.subscriptions`
+## `MyView.prototype.subscriptions`
 
 This is a &lt;string, string&gt; map where keys are channels and values are the names of methods declared on that view.
 It's similar to the existing events object on Backbone views, and looks like this:
@@ -95,7 +102,11 @@ var MyView = Backbone.View.extend({
 Backbone.Subscriptions.publish('foo');
 ```
 
-#### Channel filtering
+## `Backbone.Subscriptions.setDomTrackingClassName(string)`
+
+To facilitate the discovery of views in the DOM, each view's `el` is given the class name "subscriber". In cases where this collides with existing conventions, this method can be called when your app first starts with whatever className you want.
+
+### Channel filtering
 
 Optionally, channels may be filtered by argument list length and typeof.
 
@@ -119,15 +130,15 @@ var MyView = Backbone.View.extend({
 });
 ```
 
-#### Handler methods
+### Handler methods
 
 Handler methods are plain old view methods like any other backbone view method.
 They get passed an event object as the first parameter.
 Any subsequent arguments are passed along as well.
 
-## Use case examples
+# Use case examples
 
-### Example 1: Responsive views
+## Example 1: Responsive views
 
 ```javascript
 /* main.js
@@ -157,7 +168,7 @@ var Menu = Backbone.View.extend({
 });
 ```
 
-### Example 2: Collapse-all button
+## Example 2: Collapse-all button
 
 ```javascript
 /* list.js
@@ -196,12 +207,4 @@ var Item = Backbone.View.extend({
     this.$el.removeClass('expanded');
   }
 });
-```
-
-## DOM tracking class name
-
-To facilitate the discovery of views in the DOM, each view's `el` is given the class name "subscriber". In cases where this collides with existing conventions, the following method can be called when your app first starts:
-
-```javascript
-Backbone.subscriptions.setDomTrackingClassName('my-custom-class');
 ```

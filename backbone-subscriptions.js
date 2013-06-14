@@ -34,11 +34,11 @@ SOFTWARE.
    * If AMD is available, use it.
    */
   var isAmd = typeof window.define === "function" && window.define.amd;
-  var define = isAmd ? window.define : function(list, cb) {
+  var define = isAmd ? window.define : function(name, list, cb) {
     cb(Backbone);
   };
 
-  define([
+  define('backbone-subscriptions', [
     'backbone'
   ],function(
     Backbone
