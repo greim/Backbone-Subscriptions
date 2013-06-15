@@ -1,6 +1,6 @@
 # Pain-free publish/subscribe for Backbone views
 
-Backbone subscriptions makes it easy to compose views into large applications by allowing *cross-view communication*, while avoiding common problems associated with setting up lots of event handlers in complex web applications. ([see below](#core-concepts))
+Backbone subscriptions makes it easy to compose views into large applications using a publish/subscribe event handling pattern, while avoiding common problems associated with event handling in complex web applications. ([see below](#core-concepts))
 
 ## Features
 
