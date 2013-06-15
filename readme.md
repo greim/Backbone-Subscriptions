@@ -1,6 +1,6 @@
 # Pain-free publish/subscribe for Backbone views
 
-Backbone subscriptions makes it easy to compose views into large applications using a publish/subscribe event handling pattern, while avoiding [common problems](#core-concepts) associated with event handling in complex web applications.
+Backbone subscriptions makes it easy to compose views into large applications using a publish/subscribe event handling pattern, while avoiding [common problems](#why-a-backbone-extension) associated with event handling in complex web applications.
 
 [&#8595; Jump straight to code samples](#use-case-examples)
 
@@ -45,7 +45,7 @@ define([
 });
 ```
 
-# Core concepts
+# Why a Backbone extension?
 
 ## Memory leaks and zombie views
 
