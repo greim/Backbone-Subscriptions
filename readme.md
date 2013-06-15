@@ -55,7 +55,7 @@ If you care about performance at all, this drastically complicates the use of ev
 
 ## DOM as system of record
 
-In Backbone subscriptions, the reference chain from listenee to listener *is* the DOM.
+In Backbone subscriptions, the DOM itself is the reference chain from listenee to listener.
 When an event is published, Backbone subscriptions simply looks at the DOM for any subscribing views.
 This approach gives several benefits:
 
