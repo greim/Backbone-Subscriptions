@@ -2,6 +2,8 @@
 
 Backbone subscriptions makes it easy to compose views into large applications using a publish/subscribe event handling pattern, while avoiding common problems associated with event handling in complex web applications. ([see below](#core-concepts))
 
+[Jump straight to code samples.](#use-case-examples)
+
 ## Features
 
  * Uses a publish/subscribe pattern to achieve loose coupling.
