@@ -168,6 +168,7 @@ SOFTWARE.
         args.unshift(event);
         var liveElements = elementListByClass(subscriberClassName);
 
+        var results = [];
         _(liveElements).each(function(el){
           if (!el.view) return;
           if (!el.view.subscriptions) return;
@@ -177,7 +178,7 @@ SOFTWARE.
             var filter = getChannelFilter(filterString);
             if (filter.test(channel, sig)) {
               if (!scopeView || Backbone.$.contains(scopeView.el, el)) {
-                view[subs[filterString]].apply(view, args);
+                results.push(view[subs[filterString]].apply(view, args));
               }
             }
           });
@@ -185,6 +186,7 @@ SOFTWARE.
         if (isGlobal) {
           Backbone.Subscriptions.trigger.apply(Backbone.Subscriptions, sig);
         }
+        return results;
       },
 
       /**
