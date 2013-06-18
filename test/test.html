@@ -58,6 +58,23 @@ var TestView2 = Backbone.View.extend({
     this.$el.append(el);
   }
 });
+var ReturningView1 = Backbone.View.extend({
+  subscriptions: { 'foo': 'foo' },
+  foo: function() { return 0; }
+});
+var ReturningView2 = Backbone.View.extend({
+  subscriptions: { 'foo': 'foo' },
+  foo: function() { return ''; }
+});
+var ReturningView3 = Backbone.View.extend({
+  subscriptions: { 'foo': 'foo' },
+  foo: function() {}
+});
+var ReturningView4 = Backbone.View.extend({
+  subscriptions: { 'foo': 'foo' },
+  foo: function() { return {}; }
+});
+
 
 describe('global publish', function(){
   it('should not work before view is live', function(){
@@ -154,6 +171,17 @@ describe('method calls', function(){
     });
     $('#catcher').html(fake.el);
     Backbone.Subscriptions.publish('bar',0,1,2);
+  })
+  it('should return values of every subscribing method in an array', function(){
+    var v1 = new ReturningView1();
+    var v2 = new ReturningView2();
+    var v3 = new ReturningView3();
+    var v4 = new ReturningView4();
+    $('#catcher').html([v1.el,v2.el,v3.el,v4.el]);
+    var result = Backbone.Subscriptions.publish('foo');
+    result = _(result).map(function(item){ return typeof item; });
+    result = result.join(',');
+    assert('number,string,undefined,object' === result)
   })
 })
 describe('content filtering', function(){
