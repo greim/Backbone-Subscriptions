@@ -78,7 +78,7 @@ When called, any views that subscribe to that channel, anywhere on the page, are
 
 ## Backbone.View.prototype.publish(string)
 
-This method is identical to the one above, except that it's called on a view instance, and only affects nested views.
+This method is identical to the one above, except that it's called on a view instance, and only affects nested views in a downward fashion.
 In other words, in the DOM tree, if viewA.el contains viewB.el but not viewC.el, and viewB and viewC both subscribe to channel 'foo', then calling `viewA.publish('foo')` will only notify viewB, not viewC.
 
 This is only applicable in a nested-view scenario, i.e. when a view instantiates other views and inserts them into its own DOM tree.
