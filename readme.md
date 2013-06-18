@@ -2,7 +2,8 @@
 
 Backbone Subscriptions makes it easy to compose views into large applications using a publish/subscribe event handling pattern, while avoiding [common problems](#why-a-backbone-extension) associated with event handling in complex web applications.
 
-[&#8595; Jump straight to code samples.](#use-case-examples)
+ * [Jump straight to code samples &#8595;](#use-case-examples)
+ * [Jump straight to theory and philosophy of this lib &#8595;](#why-a-backbone-extension)
 
 ## Features
 
