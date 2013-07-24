@@ -70,11 +70,17 @@ SOFTWARE.
     var elementListByClass = (function() {
       var lists = {}; // this is the cache
       var slice = [].slice;
-      var useFallback = typeof document.getElementsByClassName !== 'function';
+      var GEBCNExists = typeof document.getElementsByClassName === 'function';
+      var QSAExists = typeof document.querySelectorAll === 'function';
       return function(className) {
-        if (useFallback) {
+        if (!GEBCNExists && !QSAExists) {
+          // unofficial effort to support IE7; prob not performant
+          return Backbone.$('.'+className).toArray();
+        } else if (!GEBCNExists) {
+          // IE8 fallback
           return document.querySelectorAll('.'+className);
         } else {
+          // modern browsers
           if (!lists[className]) {
             // gebcn returns a "live" list, so it will be automatically
             // updated by the browser from here on out
