@@ -72,14 +72,8 @@ SOFTWARE.
       var slice = [].slice;
       var GEBCNExists = typeof document.getElementsByClassName === 'function';
       var QSAExists = typeof document.querySelectorAll === 'function';
-      return function(className) {
-        if (!GEBCNExists && !QSAExists) {
-          // unofficial effort to support IE7; prob not performant
-          return Backbone.$('.'+className).toArray();
-        } else if (!GEBCNExists) {
-          // IE8 fallback
-          return document.querySelectorAll('.'+className);
-        } else {
+      if (GEBCNExists) {
+        return function(className) {
           // modern browsers
           if (!lists[className]) {
             // gebcn returns a "live" list, so it will be automatically
@@ -87,8 +81,18 @@ SOFTWARE.
             lists[className] = document.getElementsByClassName(className);
           }
           return lists[className];
-        }
-      };
+        };
+      } else if (QSAExists) {
+        return function(className) {
+          // IE8 fallback
+          return document.querySelectorAll('.'+className);
+        };
+      } else {
+        return function(className) {
+          // unofficial effort to support IE7; prob not performant
+          return Backbone.$('.'+className).toArray();
+        };
+      }
     })();
 
     function Event(props){
