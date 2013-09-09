@@ -180,7 +180,7 @@ SOFTWARE.
 
         var results = [];
         _(liveElements).each(function(el){
-          if (!el.view) return;
+          if (!el || !el.view) return;
           if (!el.view.subscriptions) return;
           var view = el.view;
           var subs = view.subscriptions;
