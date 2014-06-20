@@ -76,6 +76,27 @@ var ReturningView4 = Backbone.View.extend({
 });
 
 
+describe('basic works', function(){
+  it('should work', function(done){
+    var Custom = Backbone.View.extend({
+      subscriptions: { 'foo': 'foo' },
+      foo: function(){done()}
+    })
+    var custom = new Custom();
+    $('#catcher').html(custom.el);
+    Backbone.Subscriptions.publish('foo')
+  })
+  it('should work with custom attributes', function(done){
+    var Custom = Backbone.View.extend({
+      className:'blah',
+      subscriptions: { 'foo': 'foo' },
+      foo: function(){done()}
+    })
+    var custom = new Custom();
+    $('#catcher').html(custom.el);
+    Backbone.Subscriptions.publish('foo')
+  })
+})
 describe('global publish', function(){
   it('should not work before view is live', function(){
     var fake = new TestView1();

@@ -46,22 +46,30 @@ SOFTWARE.
 
     var subscriberClassName = 'subscriber';
 
-    /*
-     * This is a bit of voodoo to ensure that subscribing
-     * views are reachable through the DOM.
-     */
-    var setElement = Backbone.View.prototype.setElement;
-    Backbone.View.prototype.setElement = function() {
-      var result = setElement.apply(this, arguments);
-      if (this.subscriptions) {
-        this.el.view = this;
-        this.$el.addClass(subscriberClassName);
-      } else {
-        this.el.view = undefined;
-        this.$el.removeClass(subscriberClassName);
+    var Super = Backbone.View;
+    Backbone.View = Super.extend({
+
+      setElement: function(){
+        var result = Super.prototype.setElement.apply(this, arguments);
+        if (this.subscriptions) {
+          this.el.view = this;
+          this.$el.addClass(subscriberClassName);
+        } else {
+          this.el.view = undefined;
+          this.$el.removeClass(subscriberClassName);
+        }
+        return result;
+      },
+
+      _setAttributes: function(attrs){
+        var hasClass = this.$el.hasClass(subscriberClassName);
+        var result = Super.prototype._setAttributes.apply(this, arguments);
+        if (hasClass){
+          this.$el.addClass(subscriberClassName);
+        }
+        return result;
       }
-      return result;
-    };
+    });
 
     /*
      * Returns a list of elements by class name. Uses native
